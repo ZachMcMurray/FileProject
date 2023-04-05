@@ -29,6 +29,14 @@ public class RemteEntry extends Entrys {
     private int entryId;
     public Entry entry;
 
+    public String getRepoId() {
+        return repoId;
+    }
+
+    public int getEntryId() {
+        return entryId;
+    }
+
     public RemteEntry(String repoId, int entryId) {
         location = "remte";
         this.repoId = repoId;
@@ -77,11 +85,13 @@ public class RemteEntry extends Entrys {
                 downloadFolder(client,this.entryId,this.file);
 
             }
+            client.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         this.name = file.getName();
+        
     }
 
     final public void setEntryId(int entryId) {

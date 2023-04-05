@@ -3,23 +3,11 @@
  */
 package com.mycompany.fileprocessing;
 
-import com.laserfiche.api.client.model.AccessKey;
-import com.laserfiche.repository.api.RepositoryApiClient;
-import com.laserfiche.repository.api.RepositoryApiClientImpl;
-import com.laserfiche.repository.api.clients.impl.model.Entry;
-import com.laserfiche.repository.api.clients.impl.model.ODataValueContextOfIListOfEntry;
 import com.nimbusds.jose.shaded.json.JSONArray;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.JSONParser;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.function.Consumer;
 
 /**
  *
@@ -29,17 +17,16 @@ public class FileProcessing {
 
     public static void main(String[] args) {
         ArrayList<Entrys> inputList = new ArrayList<>();
-        ArrayList<Entrys> outputList = new ArrayList<>();
         String key = null;
         String operator = null;
         long length = 0;
-        int min=0;
-        int lines=0;
-        int max=0;
-        String suffix=null;
-        
+        int min = 0;
+        int lines = 0;
+        int max = 0;
+        String suffix = null;
+
         JSONParser jsonParser = new JSONParser();
-        try (FileReader reader = new FileReader("C:\\Users\\zmcmu\\OneDrive\\Documents\\NetBeansProjects\\FileProcessing\\jasonJsonV2.txt")) {
+        try (FileReader reader = new FileReader("C:\\Users\\zmcmu\\OneDrive\\Documents\\NetBeansProjects\\FileProcessing\\jasonJsonCount.txt")) {
             Object obj = jsonParser.parse(reader);
 
             JSONObject j = (JSONObject) obj;
@@ -64,10 +51,6 @@ public class FileProcessing {
                 }
             }
 
-            for (Entrys c : inputList) {
-                System.out.println(c.name);
-            }
-
             JSONArray parameters;
             for (int x = 0; x < processing_elements.size(); x++) {
                 JSONObject tempElement = (JSONObject) processing_elements.get(x);
@@ -88,7 +71,7 @@ public class FileProcessing {
                             }
                         }
                         Name nFilter = new Name();
-                        outputList = new ArrayList(nFilter.nameFilter(inputList, key));
+                        inputList = new ArrayList(nFilter.nameFilter(inputList, key));
                         break;
 
                     case "Length Filter":
@@ -110,7 +93,7 @@ public class FileProcessing {
                             }
                         }
                         Length lFilter = new Length();
-                        outputList = new ArrayList(lFilter.lenghtFilter(inputList, operator, length));
+                        inputList = new ArrayList(lFilter.lenghtFilter(inputList, operator, length));
                         break;
 
                     case "Content Filter":
@@ -128,7 +111,7 @@ public class FileProcessing {
                             }
                         }
                         ContentFilter cFFilter = new ContentFilter();
-                        outputList = new ArrayList(cFFilter.filter(inputList, key));
+                        inputList = new ArrayList(cFFilter.filter(inputList, key));
 
                         break;
                     case "Count Filter":
@@ -148,9 +131,9 @@ public class FileProcessing {
                                     System.out.println("name in json file does not line up with parameters");
                             }
                         }
-                        
+
                         Count cFilter = new Count();
-                        outputList = new ArrayList(cFilter.filter(inputList, key, min));
+                        inputList = new ArrayList(cFilter.filter(inputList, key, min));
                         break;
                     case "Split":
                         System.out.println("Split");
@@ -166,6 +149,10 @@ public class FileProcessing {
                                     System.out.println("name in json file does not line up with parameters");
                             }
                         }
+
+                        Split fileSplit = new Split(inputList, lines);
+                        inputList = fileSplit.split();
+
                         break;
                     case "List":
                         System.out.println("List");
@@ -180,7 +167,11 @@ public class FileProcessing {
                                 default:
                                     System.out.println("name in json file does not line up with parameters");
                             }
+
                         }
+
+                        list list = new list();
+                        inputList = list.list(inputList, max);
                         break;
                     case "Rename":
                         System.out.println("Rename");
@@ -195,21 +186,23 @@ public class FileProcessing {
                                 default:
                                     System.out.println("name in json file does not line up with parameters");
                             }
+
+                            Rename rename = new Rename();
+                            rename.renamePE(inputList, suffix);
                         }
                         break;
                     case "Print":
                         System.out.println("Print");
+
+                        PrintProcessingElement print = new PrintProcessingElement();
+                        print.printEntries(inputList);
                         break;
                     default:
                         break;
                 }
 
-                for (Entrys c : outputList) {
-                    System.out.println(c.name);
-                }
-
             }
-
+            reader.close();
         } catch (Exception a) {
             a.printStackTrace();
         }
