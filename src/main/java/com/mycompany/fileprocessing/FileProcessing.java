@@ -27,24 +27,24 @@ public class FileProcessing {
 
         JSONParser jsonParser = new JSONParser();
         try (FileReader reader = new FileReader("C:\\Users\\zmcmu\\OneDrive\\Documents\\NetBeansProjects\\FileProcessing\\jasonJsonCount.txt")) {
-            Object obj = jsonParser.parse(reader);
+            Object obj = jsonParser.parse(reader);//make json object
 
             JSONObject j = (JSONObject) obj;
             JSONArray processing_elements = (JSONArray) j.get("processing_elements");
             JSONObject firstElement = (JSONObject) processing_elements.get(0);
-            JSONArray input_entries = (JSONArray) firstElement.get("input_entries");
+            JSONArray input_entries = (JSONArray) firstElement.get("input_entries");//get the list of input files
 
             for (int x = 0; x < input_entries.size(); x++) {
                 JSONObject temp = (JSONObject) input_entries.get(x);
 
-                if (temp.get("type").equals("local")) {
+                if (temp.get("type").equals("local")) {//add local entrys to the array
                     try {
                         String path = (String) temp.get("path");
                         inputList.add(new LocalEntry(path));
                     } catch (Exception d) {
                         d.printStackTrace();
                     }
-                } else if (temp.get("type").equals("remte")) {
+                } else if (temp.get("type").equals("remte")) {//add remte entrys to the array 
                     String repoId = (String) temp.get("repositoryId");
                     long entNum = (long) temp.getAsNumber("entryId");
                     inputList.add(new RemteEntry(repoId, (int) entNum));
@@ -52,17 +52,17 @@ public class FileProcessing {
             }
 
             JSONArray parameters;
-            for (int x = 0; x < processing_elements.size(); x++) {
+            for (int x = 0; x < processing_elements.size(); x++) {//repeat for each processing element
                 JSONObject tempElement = (JSONObject) processing_elements.get(x);
-                String processingType = tempElement.getAsString("type");
+                String processingType = tempElement.getAsString("type");//get what kind of element
                 switch (processingType) {
-                    case "Name Filter":
+                    case "Name Filter"://if the json says Name Filter
                         System.out.println("Name filter");
-                        parameters = (JSONArray) tempElement.get("parameters");
-                        for (int y = 0; y < parameters.size(); y++) {
+                        parameters = (JSONArray) tempElement.get("parameters");//get array of parameters
+                        for (int y = 0; y < parameters.size(); y++) {//repeat for each parameter
                             JSONObject pN = (JSONObject) parameters.get(y);
                             String pName = (String) pN.getAsString("name");
-                            switch (pName) {
+                            switch (pName) {//asign to useable varuble 
                                 case "Key":
                                     key = (String) pN.getAsString("value");
                                     break;
@@ -70,8 +70,8 @@ public class FileProcessing {
                                     System.out.println("name in json file does not line up with parameters");
                             }
                         }
-                        Name nFilter = new Name();
-                        inputList = new ArrayList(nFilter.nameFilter(inputList, key));
+                        Name nFilter = new Name();//make name object
+                        inputList = new ArrayList(nFilter.nameFilter(inputList, key));//apply filter 
                         break;
 
                     case "Length Filter":
